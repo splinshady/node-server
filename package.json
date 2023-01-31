@@ -5,7 +5,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "express-validator": "^6.14.3"
+    "express-validator": "^6.14.3",
+    "mongodb": "^4.13.0"
   },
   "scripts": {
     "watch": "tsc -w",

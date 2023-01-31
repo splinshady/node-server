@@ -2,6 +2,7 @@ import express, {NextFunction, Request, Response} from 'express'
 import bodyParser from 'body-parser'
 import {productsRoute} from "./routes/products-route";
 import {addressesRoute} from "./routes/address-route";
+import {runDb} from "./repositories/db";
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -22,6 +23,12 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/products', productsRoute)
 app.use('/addresses', addressesRoute)
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+const startApp = async () => {
+  await runDb()
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
+}
+
+startApp()
+
