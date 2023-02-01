@@ -1,7 +1,7 @@
 import {MongoClient} from "mongodb";
 import {ProductType} from "./products-repository";
 
-const mongoUri = process.env.mongoURI || "mongodb://0.0.0.0:27017"
+const mongoUri = process.env.mongoURI || "mongodb+srv://splin:anton@cluster17.azmyvzb.mongodb.net/?retryWrites=true&w=majority"
 
 const client = new MongoClient(mongoUri)
 const db = client.db("shop");
@@ -13,6 +13,7 @@ export async function runDb() {
     await client.db("products").command({ping: 1})
     console.log("Connected MongoDB")
   } catch (e) {
+    console.log(e)
     await client.close()
   }
 }
