@@ -6,7 +6,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "express-validator": "^6.14.3",
-    "mongodb": "^4.13.0"
+    "mongodb": "^4.13.0",
+    "mongoose": "^6.9.0"
   },
   "scripts": {
     "watch": "tsc -w",

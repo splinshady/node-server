@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import {productsRoute} from "./routes/products-route";
 import {addressesRoute} from "./routes/address-route";
 import {runDb} from "./repositories/db";
+import {authRoute} from "./routes/auth-route";
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -20,6 +21,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send(hello)
 })
 
+app.use('/auth', authRoute)
 app.use('/products', productsRoute)
 app.use('/addresses', addressesRoute)
 

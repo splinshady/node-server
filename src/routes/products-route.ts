@@ -9,7 +9,6 @@ const titleValidation = body('title').trim().isLength({min: 3, max: 10})
   .withMessage('Title should bo from 3 to 10 symbols')
 
 productsRoute.get('/', async (req: Request, res: Response) => {
-  console.log(req.query.title)
   const foundProducts = await productsRepository.findProducts(req.query.title ? req.query.title.toString() : null)
   res.send(foundProducts)
 })
