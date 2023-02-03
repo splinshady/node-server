@@ -7,7 +7,6 @@ const mongoUri = process.env.mongoURI || "mongodb+srv://splin:anton@cluster17.az
 const client = new MongoClient(mongoUri)
 const db = client.db("shop");
 export const productTypeCollection = db.collection<ProductType>('products');
-export const rolesTypeCollection = db.collection<ProductType>('products');
 
 export async function runDb() {
   try {
