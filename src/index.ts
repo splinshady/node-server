@@ -1,7 +1,8 @@
 import express, {NextFunction, Request, Response} from 'express'
-import bodyParser from 'body-parser'
 import {db} from "./db";
-import {ApolloServer, gql} from "apollo-server-express";
+import {ApolloServer} from "apollo-server-express";
+import {typeDefs} from "./schema";
+import {resolvers} from "./resolvers";
 import {models} from "./models";
 
 const app = express()
@@ -16,51 +17,23 @@ const visitCountMiddleware = (req: Request, res: Response, next: NextFunction) =
   next()
 }
 
-app.use(bodyParser(), visitCountMiddleware)
+app.use(visitCountMiddleware)
 app.get('/', (req: Request, res: Response) => {
   let hello = 'Hi node!' + visitCount;
   res.send(hello)
 })
 
-const typeDefs = gql`
-  type Note {
-    id: ID
-    content: String
-    author: String
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: () => {
+    return {models}
   }
-  type Query {
-    notes: [Note]
-    note(id: ID): Note
-  }
-  type Mutation {
-    newNote(content: String!): Note
-  }
-`
-
-const resolvers = {
-  Query: {
-    notes: async () => {
-      return await models.Note.find();
-    },
-    note: async (parent: any, args: any) => {
-      return await models.Note.findById(args.id);
-    },
-  },
-  Mutation: {
-    newNote: async (parent: any, args: any) => {
-      return await models.Note.create({
-        content: args.content,
-        author: "You"
-      })
-    }
-  }
-}
-
-const server = new ApolloServer({typeDefs, resolvers});
+});
 
 const startApp = async () => {
   await server.start()
-  server.applyMiddleware({ app, path: '/api' });
+  server.applyMiddleware({app, path: '/api'});
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}${server.graphqlPath}`)
   })
