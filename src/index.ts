@@ -4,6 +4,9 @@ import {ApolloServer} from "apollo-server-express";
 import {typeDefs} from "./schema";
 import {resolvers} from "./resolvers";
 import {models} from "./models";
+import jwt from "jsonwebtoken";
+
+require('dotenv').config()
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -23,11 +26,24 @@ app.get('/', (req: Request, res: Response) => {
   res.send(hello)
 })
 
+const getUser = (token: string | undefined) => {
+  if (token) {
+    try {
+      return jwt.verify(token, process.env.JWT_SECRET as string)
+    } catch (e) {
+      new Error('Session invalid')
+    }
+  }
+}
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: () => {
-    return {models}
+  context: ({req}) => {
+    const token = req.headers.authorization
+    const user = getUser(token)
+    console.log(user)
+    return {models, user}
   }
 });
 
