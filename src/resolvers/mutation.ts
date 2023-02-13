@@ -32,9 +32,17 @@ export const Mutation = {
     }
   },
 
-  updateNote: async (parent: any, {content, id}: any, {models}: any) => {
+  updateNote: async (parent: any, {content, id}: any, {models, user}: any) => {
+    if (!user) {
+      throw new AuthenticationError("You most be signed in to delete a note")
+    }
+    const note = await models.Note.findById(id)
+    if (note && String(note.author) !== user.id) {
+      throw new ForbiddenError("You don't have permissions to change the note")
+    }
+
     try {
-      return await models.Note.findByIdAndUpdate(
+      return await models.Note.findOneAndUpdate(
         {_id: id},
         {$set: {content: content}},
         {new: true}

@@ -17,6 +17,9 @@ export const typeDefs = gql`
     updatedAt: DateTime!
   }
   type Query {
+    user(userName: String!): User
+    users: [User!]!
+    me: User!
     notes: [Note]
     note(id: ID): Note
   }
