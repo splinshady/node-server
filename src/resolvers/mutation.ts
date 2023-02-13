@@ -90,4 +90,32 @@ export const Mutation = {
     }
     return jwt.sign({id: user._id}, process.env.JWT_SECRET as string)
   },
+
+  toggleFavorite: async (parent: any, {id}: any, {models, user}: any) => {
+    if (!user) {
+      throw new AuthenticationError("You aren't authorized")
+    }
+    let neteCheck = await models.Note.findById(id)
+    const hasUser = neteCheck.favoriteBy.indexOf(user.id)
+
+    if (hasUser >= 0) {
+      return await models.Note.findByIdAndUpdate(
+        id,
+        {
+          $pull: {favoriteBy: new mongoose.Types.ObjectId(user.id)},
+          $inc: {favoriteCount: -1}
+        },
+        {new: true}
+      )
+    } else {
+      return await models.Note.findByIdAndUpdate(
+        id,
+        {
+          $push: {favoriteBy: new mongoose.Types.ObjectId(user.id)},
+          $inc: {favoriteCount: 1}
+        },
+        {new: true}
+      )
+    }
+  }
 }

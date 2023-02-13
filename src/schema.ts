@@ -8,6 +8,7 @@ export const typeDefs = gql`
     email: String!
     avatar: String
     notes: [Note]!
+    favorites: [Note!]!
   }
   type Note {
     id: ID
@@ -15,6 +16,8 @@ export const typeDefs = gql`
     author: String
     createdAt: DateTime!
     updatedAt: DateTime!
+    favoriteCount: Int!
+    favoriteBy: [User!]
   }
   type Query {
     user(userName: String!): User
@@ -29,5 +32,6 @@ export const typeDefs = gql`
     deleteNote(id: ID!): Boolean!
     signUp(email: String!, userName: String!, password: String!): String!
     signIn(email: String, userName: String, password: String!): String!
+    toggleFavorite(id: ID!): Note!
   }
 `
