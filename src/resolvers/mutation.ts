@@ -1,24 +1,37 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import {gravatar} from "../util/gravatar"
-import {AuthenticationError} from "apollo-server-express";
+import {AuthenticationError, ForbiddenError} from "apollo-server-express";
+import mongoose from "mongoose";
 
 export const Mutation = {
-  newNote: async (parent: any, args: any, {models}: any) => {
+  newNote: async (parent: any, args: any, {models, user}: any) => {
+    if (!user) {
+      throw new AuthenticationError("You most be signed in to create a note")
+    }
     return await models.Note.create({
       content: args.content,
-      author: "You"
+      author: new mongoose.Types.ObjectId(user.id)
     })
   },
-  deleteNote: async (parent: any, {id}: any, {models}: any) => {
+
+  deleteNote: async (parent: any, {id}: any, {models, user}: any) => {
+    if (!user) {
+      throw new AuthenticationError("You most be signed in to delete a note")
+    }
+    const note = await models.Note.findById(id)
+    if (note && String(note.author) !== user.id) {
+      throw new ForbiddenError("You don't have permissions to delete the note")
+    }
     try {
-      await models.Note.findByIdAndRemove({_id: id})
+      await note.remove()
       return true
     } catch (e) {
       console.error(e)
       return false
     }
   },
+
   updateNote: async (parent: any, {content, id}: any, {models}: any) => {
     try {
       return await models.Note.findByIdAndUpdate(
@@ -30,6 +43,7 @@ export const Mutation = {
       console.error(e)
     }
   },
+
   signUp: async (parent: any, {userName, email, password}: any, {models}: any) => {
     email = email.trim().toLowerCase()
     const hashed = await bcrypt.hash(password, 10)
@@ -47,6 +61,7 @@ export const Mutation = {
       throw new Error("Creating account error")
     }
   },
+
   signIn: async (parent: any, {userName, email, password}: any, {models}: any) => {
     if (email) {
       email = email.trim().toLowerCase()
